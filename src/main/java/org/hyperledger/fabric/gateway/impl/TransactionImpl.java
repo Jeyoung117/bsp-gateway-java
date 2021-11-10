@@ -467,24 +467,7 @@ private byte[] commitTransaction(final Collection<ProposalResponse> validRespons
         Query query = new QueryImpl(network.getChannel(), request);
 
         BspTransactionOuterClass.SubmitResponse response = queryHandler.evaluatetoCorfu(query);
-//        try {
-//            int kvrwSet1 = response.getChaincodeActionResponseReadWriteSetInfo()
-//                    .getNsRwsetInfo(1)
-//                    .getRwset()
-//                    .getRangeQueriesInfoCount();
-////            KvRwset.KVRead kvrwSet2 =  response.getChaincodeActionResponseReadWriteSetInfo()
-////                    .getNsRwsetInfo(1)
-////                    .getRwset()
-////                    .getReads(2);
-//
-////            System.out.println(kvrwSet1);
-////            System.out.println(kvrwSet2);
-//
-//        } catch (InvalidArgumentException e) {
-//            e.printStackTrace();
-//        } catch (InvalidProtocolBufferException e) {
-//            e.printStackTrace();
-//        }
+
         byte[] byteArray = response.getPayload().toByteArray();
             return byteArray;
 
