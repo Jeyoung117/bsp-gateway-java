@@ -43,6 +43,8 @@ public interface Contract {
      */
     Transaction createTransaction(String name);
 
+    Transaction createTransaction();
+
     /**
      * Submit a transaction to the ledger. The transaction function {@code name}
      * will be evaluated on the endorsing peers and then submitted to the ordering service

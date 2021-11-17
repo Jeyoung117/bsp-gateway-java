@@ -7,10 +7,12 @@
 package org.hyperledger.fabric.gateway;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.hyperledger.fabric.protos.common.Common;
 import org.hyperledger.fabric.sdk.Peer;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 
@@ -96,4 +98,8 @@ public interface Transaction {
      */
     byte[] sendTransaction(final Collection<ProposalResponse> validResponses)
             throws TimeoutException, ContractException, InterruptedException;
+
+    String sendEnvelope(Common.Envelope env) throws ContractException;
+
+    String sendEnvelopes(List<Common.Envelope> envs) throws ContractException;
 }

@@ -48,6 +48,10 @@ public final class ContractImpl implements Contract, AutoCloseable {
         String qualifiedName = getQualifiedName(name);
         return new TransactionImpl(this, qualifiedName);
     }
+    @Override
+    public Transaction createTransaction() {
+        return new TransactionImpl(this);
+    }
 
     @Override
     public byte[] submitTransaction(final String name, final String... args) throws ContractException, TimeoutException, InterruptedException {

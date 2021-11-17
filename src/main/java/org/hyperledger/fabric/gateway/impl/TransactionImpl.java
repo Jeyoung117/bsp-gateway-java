@@ -32,6 +32,7 @@ import org.hyperledger.fabric.gateway.spi.CommitHandler;
 import org.hyperledger.fabric.gateway.spi.CommitHandlerFactory;
 import org.hyperledger.fabric.gateway.spi.Query;
 import org.hyperledger.fabric.gateway.spi.QueryHandler;
+import org.hyperledger.fabric.protos.common.Common;
 import org.hyperledger.fabric.protos.ledger.rwset.kvrwset.KvRwset;
 import org.hyperledger.fabric.protos.orderer.ClusterOuterClass;
 import org.hyperledger.fabric.protos.peer.ProposalResponsePackage;
@@ -60,19 +61,20 @@ public final class TransactionImpl implements Transaction {
     private Map<String, byte[]> transientData = null;
     private Collection<Peer> endorsingPeers = null;
 
-//    private String corfu_host = "141.223.121.139";
-//    private int corfu_port = 54323;
-//
-//    private ManagedChannel corfu_channel = ManagedChannelBuilder.forAddress(corfu_host, corfu_port)
-//            .usePlaintext()
-//            .build();
-//
-//     CorfuConnectGrpc.CorfuConnectBlockingStub stub =
-//            CorfuConnectGrpc.newBlockingStub(corfu_channel);
-
     TransactionImpl(final ContractImpl contract, final String name) {
         this.contract = contract;
         this.name = name;
+        network = contract.getNetwork();
+        channel = network.getChannel();
+        gateway = network.getGateway();
+        commitHandlerFactory = gateway.getCommitHandlerFactory();
+        commitTimeout = gateway.getCommitTimeout();
+        queryHandler = network.getQueryHandler();
+    }
+
+    public TransactionImpl(final ContractImpl contract) {
+        this.contract = contract;
+        this.name = null;
         network = contract.getNetwork();
         channel = network.getChannel();
         gateway = network.getGateway();
@@ -380,6 +382,34 @@ private byte[] commitTransaction(final Collection<ProposalResponse> validRespons
         } catch (InvalidArgumentException e) {
             throw new GatewayRuntimeException(e);
         }
+    }
+
+    public String sendEnvelope(Common.Envelope env)
+            throws ContractException {
+
+        try {
+            Channel.TransactionOptions transactionOptions = Channel.TransactionOptions.createTransactionOptions()
+                    .nOfEvents(Channel.NOfEvents.createNoEvents()); // Disable default commit wait behaviour
+            channel.sendEnvelope(env, transactionOptions);
+        } catch (Exception e) {
+            throw new ContractException("Failed to send transaction to the orderer", e);
+        }
+
+        return "success sending env";
+    }
+
+    public String sendEnvelopes(List<Common.Envelope> envs)
+            throws ContractException {
+
+        try {
+            Channel.TransactionOptions transactionOptions = Channel.TransactionOptions.createTransactionOptions()
+                    .nOfEvents(Channel.NOfEvents.createNoEvents()); // Disable default commit wait behaviour
+            channel.sendEnvelopes(envs, transactionOptions);
+        } catch (Exception e) {
+            throw new ContractException("Failed to send transaction to the orderer", e);
+        }
+
+        return "success sending env";
     }
 
     /* Original sendTransaction
